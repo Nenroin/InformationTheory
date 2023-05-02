@@ -21,7 +21,7 @@ number = 1
 for num in experimental_values:
     print(num, " ", end="")
     if number % 10 == 0:
-        print("\n", end="")
+        print()
     number += 1
 else:
     number = 1
@@ -34,7 +34,7 @@ print("1. Записываем числовые значения (вариант
 for num in experimental_values:
     print(num, " ", end="")
     if number % 10 == 0:
-        print("\n", end="")
+        print()
     number += 1
 else:
     number = 0
