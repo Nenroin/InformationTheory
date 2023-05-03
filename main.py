@@ -1,4 +1,5 @@
 import math
+from scipy.stats import chi2
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
@@ -65,10 +66,10 @@ else:
     number = 0
 
 print("Выпишем границы интервалов",
-      "\na₁ = ", round(interval_boundaries[0], 4), "; a₂ = ", round(interval_boundaries[1], 4), "; a₃ = ",
-      round(interval_boundaries[2], 4), "; a₄ = ", round(interval_boundaries[3], 4), "; a₅ = ",
-      round(interval_boundaries[4], 4), "; \na₆ = ", round(interval_boundaries[5], 4), "; a₇ = ",
-      round(interval_boundaries[6], 4), "; a₈ = ", round(interval_boundaries[7], 4), "; a₉ = ",
+      "\na₁ =", round(interval_boundaries[0], 4), ";  a₂ = ", round(interval_boundaries[1], 4), ";  a₃ =",
+      round(interval_boundaries[2], 4), ";  a₄ =", round(interval_boundaries[3], 4), ";  a₅ =",
+      round(interval_boundaries[4], 4), "; \na₆ =", round(interval_boundaries[5], 4), ";  a₇ =",
+      round(interval_boundaries[6], 4), ";  a₈ =", round(interval_boundaries[7], 4), ";  a₉ =",
       round(interval_boundaries[8], 4), ";")
 
 print("Подсчитаем число вариант, попавших в каждый интервал, т.е. находим частоты mᵢ , запишем интервальное,",
@@ -82,11 +83,11 @@ for num in experimental_values:
     else:
         distribution_of_sampling_frequencies_m.append(1)
         print(round(interval_boundaries[number], 4), "-", round(interval_boundaries[number + 1], 4),
-              f" m{number + 1} = ", round(distribution_of_sampling_frequencies_m[number], 4))
+              f"  m{number + 1} =", round(distribution_of_sampling_frequencies_m[number], 4))
         number += 1
 else:
     print(round(interval_boundaries[number], 4), "-", round(interval_boundaries[number + 1], 4),
-          f" m{number + 1} = ", round(distribution_of_sampling_frequencies_m[number], 4), "\n")
+          f"  m{number + 1} =", round(distribution_of_sampling_frequencies_m[number], 4), "\n")
     number = 0
 
 number_of_experimental_values_n = len(experimental_values)
@@ -102,8 +103,8 @@ for num in distribution_of_sampling_frequencies_m:
     relative_frequencies_w.append(num / number_of_experimental_values_n)
     densities.append(relative_frequencies_w[number] / partial_interval_length_h)
     print(f"{round(interval_boundaries[number], 4)} - {round(interval_boundaries[number + 1], 4)} ",
-          f"m{number + 1} = {round(num, 4)} w{number + 1} = {round(relative_frequencies_w[number], 4)} ",
-          f"w{number + 1}/h = {round(densities[number], 4)};")
+          f"  m{number + 1} = {round(num, 4)}   w{number + 1} = {round(relative_frequencies_w[number], 4)} ",
+          f"  w{number + 1}/h = {round(densities[number], 4)};")
     number += 1
 else:
     number = 0
@@ -165,12 +166,13 @@ while number < len(interval_boundaries) - 1:
     xi2_mi += (((interval_boundaries[number] + interval_boundaries[number + 1]) / 2)
                ** 2) * distribution_of_sampling_frequencies_m[number]
     print(f"{round(interval_boundaries[number], 4)}-{round(interval_boundaries[number + 1], 4)} ",
-          f"x{number + 1} = {round((interval_boundaries[number] + interval_boundaries[number + 1]) / 2, 4)} ",
-          f"m{number + 1} = {round(distribution_of_sampling_frequencies_m[number], 4)}", f"x{number + 1}•m{number + 1} = ",
+          f"  x{number + 1} = {round((interval_boundaries[number] + interval_boundaries[number + 1]) / 2, 4)} ",
+          f"  m{number + 1} = {round(distribution_of_sampling_frequencies_m[number], 4)}",
+          f"  x{number + 1}•m{number + 1} =",
           round(((interval_boundaries[number] + interval_boundaries[number + 1]) / 2)
-          * distribution_of_sampling_frequencies_m[number], 4), " ", f"(x{number + 1}^2)•m{number + 1} = ",
+                * distribution_of_sampling_frequencies_m[number], 4), " ", f"  (x{number + 1}^2)•m{number + 1} =",
           round((((interval_boundaries[number] + interval_boundaries[number + 1]) / 2)
-           ** 2) * distribution_of_sampling_frequencies_m[number], 4))
+                 ** 2) * distribution_of_sampling_frequencies_m[number], 4))
     number += 1
 else:
     number = 0
@@ -211,19 +213,21 @@ print("5. По виду гистограммы выдвигаем гипотез
 
 number = 1
 buff_num = 0
+bukvi_FF = []
 P = []
 
 for num in interval_boundaries:
+    bukvi_FF.append(norm.cdf((num - sample_mean_x) / corrected_mean_square_deviation_s) - 0.5)
     if num == interval_boundaries[-1]:
-        print(f"a{number} = {round(num, 4)} (a{number} - x)/s =",
+        print(f"a{number} = {round(num, 4)}   (a{number} - x)/s =",
               f"{round((num - sample_mean_x) / corrected_mean_square_deviation_s, 4)}",
-              f" Ф(u{number}) = {round(norm.cdf((num - sample_mean_x) / corrected_mean_square_deviation_s) - 0.5, 4)}",
-              f" P(сумма) = {round(buff_num, 4)}")
+              f"  Ф(u{number}) = {round(bukvi_FF[number - 1], 4)}",
+              f"  P(сумма) = {round(buff_num, 4)}")
     else:
-        print(f"a{number} = {round(num, 4)} (a{number} - x)/s =",
+        print(f"a{number} = {round(num, 4)}   (a{number} - x)/s =",
               f"{round((num - sample_mean_x) / corrected_mean_square_deviation_s, 4)}",
-              f" Ф(u{number}) = {round(norm.cdf((num - sample_mean_x) / corrected_mean_square_deviation_s) - 0.5, 4)}",
-              f" P{number} =",
+              f"  Ф(u{number}) = {round(bukvi_FF[number - 1], 4)}",
+              f"  P{number} =",
               round((norm.cdf((interval_boundaries[number] - sample_mean_x) / corrected_mean_square_deviation_s) - 0.5)
                     - (norm.cdf((num - sample_mean_x) / corrected_mean_square_deviation_s) - 0.5),4))
         buff_num += (norm.cdf((interval_boundaries[number] - sample_mean_x) / corrected_mean_square_deviation_s)
@@ -235,23 +239,48 @@ else:
     number = 0
 
 print("Статистика имеет распределение «хи-квадрат» лишь при n → ∞, поэтому необходимо, чтобы в каждом",
-      "\nинтервале было не менее 5 значений. Если mᵢ < 5, имеет смысл объединить соседние интервалы.",
-      "\nВ данном случае объединять не будем, так как все вычисления производятся программно l = 8.")
+      "\nинтервале было не менее 5 значений. Если mᵢ < 5, имеет смысл объединить соседние интервалы.")
 
 derivative_of_m = []
 buff_num = 0
 x2_nabl = 0
+num_l = 0
+buff_sum = 0
 
 for num in distribution_of_sampling_frequencies_m:
     derivative_of_m.append(100 * P[number])
     buff_num = num - derivative_of_m[number]
+    if distribution_of_sampling_frequencies_m[number] > 5:
+        num_l += 1
+    elif buff_sum <= 5:
+        buff_sum += distribution_of_sampling_frequencies_m[number]
+    else:
+        num_l += 1
     x2_nabl += (buff_num ** 2) / derivative_of_m[number]
-    print(f"№{number + 1} m{number + 1} = {num} P{number + 1} = m{number + 1}' = {round(derivative_of_m[number], 4)}",
-          f"m{number + 1} - m{number + 1}' = {round(buff_num, 4)} (m{number + 1} - m{number + 1}')² =",
-          f"{round(buff_num ** 2, 4)}", f"((m{number + 1} - m{number + 1}')²)/m{number + 1}' =",
+    print(f"№{number + 1}   m{number + 1} = {num}   P{number + 1} = m{number + 1}' = {round(derivative_of_m[number], 4)}",
+          f"  m{number + 1} - m{number + 1}' = {round(buff_num, 4)}   (m{number + 1} - m{number + 1}')² =",
+          f"{round(buff_num ** 2, 4)}", f"  ((m{number + 1} - m{number + 1}')²)/m{number + 1}' =",
           round((buff_num ** 2) / derivative_of_m[number], 4))
     number += 1
 else:
     print(f"m(сумма)' = {round(sum(derivative_of_m), 4)} x²_набл = {round(x2_nabl, 4)}")
     number = 0
 
+print(f"Находим X²_крит(a, k = l - 3) = X²_крит(0.05; {num_l} - 3) = X²_крит(0.05; {num_l - 3}) =",
+      round(chi2.ppf(1-.05, num_l - 3), 4))
+
+print(f"Так как x²_набл = {x2_nabl} < X²_крит, то гипотеза H₀ о нормальном \nраспределении принимается.",
+      "\nПо критерию Колмогорова надо сравнить",
+      f"\nλ_опыт = n¹⁄²•max|F*(xᵢ) - F(xᵢ)| и λ_крит(0.05) = 1.358.",
+      "\nДля нормального распределения \nF(xᵢ) = 0.5 + Ф((xᵢ - x)/s).",
+      "\nВ качестве xᵢ возьмем aᵢ (i = 1.9).",
+      "Составим таблицу:")
+
+for a in interval_boundaries:
+    print(f"a{number + 1} = {round(a, 4)}   F*(a{number + 1}) = {round(values_of_the_empirical_function_F[number], 4)}",
+          f"  0.5 + Ф(u{number + 1}) = 0.5 + ({round(bukvi_FF[number], 4)})   F(a{number + 1}) =",
+          round(0.5 + bukvi_FF[number], 4), f"  |F*(a{number + 1}) - F(a{number + 1})| =",
+          round(abs((values_of_the_empirical_function_F[number]) - (0.5 + bukvi_FF[number])), 4))
+    number += 1
+else:
+    number = 0
