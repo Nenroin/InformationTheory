@@ -1,4 +1,5 @@
 import math
+import statistics
 from scipy.stats import chi2
 from scipy.stats import norm
 import matplotlib.pyplot as plt
@@ -159,8 +160,10 @@ print("4. Находим выборочное среднее, среднее п�
 
 xi_mi = 0
 xi2_mi = 0
+interval_boundaries_average = []
 
 while number < len(interval_boundaries) - 1:
+    interval_boundaries_average.append((interval_boundaries[number] + interval_boundaries[number + 1]) / 2);
     xi_mi += ((interval_boundaries[number] + interval_boundaries[number + 1]) / 2) \
              * distribution_of_sampling_frequencies_m[number]
     xi2_mi += (((interval_boundaries[number] + interval_boundaries[number + 1]) / 2)
@@ -274,13 +277,73 @@ print(f"Так как x²_набл = {x2_nabl} < X²_крит, то гипоте
       f"\nλ_опыт = n¹⁄²•max|F*(xᵢ) - F(xᵢ)| и λ_крит(0.05) = 1.358.",
       "\nДля нормального распределения \nF(xᵢ) = 0.5 + Ф((xᵢ - x)/s).",
       "\nВ качестве xᵢ возьмем aᵢ (i = 1.9).",
-      "Составим таблицу:")
+      "\nСоставим таблицу:")
+
+module_f_minus_f = []
 
 for a in interval_boundaries:
+    module_f_minus_f.append(abs((values_of_the_empirical_function_F[number]) - (0.5 + bukvi_FF[number])))
     print(f"a{number + 1} = {round(a, 4)}   F*(a{number + 1}) = {round(values_of_the_empirical_function_F[number], 4)}",
           f"  0.5 + Ф(u{number + 1}) = 0.5 + ({round(bukvi_FF[number], 4)})   F(a{number + 1}) =",
           round(0.5 + bukvi_FF[number], 4), f"  |F*(a{number + 1}) - F(a{number + 1})| =",
-          round(abs((values_of_the_empirical_function_F[number]) - (0.5 + bukvi_FF[number])), 4))
+          round(module_f_minus_f[number], 4))
     number += 1
 else:
     number = 0
+
+print(f"max|F*(aᵢ) - F(aᵢ)| = {round(max(module_f_minus_f), 4)}",
+      f"\nλ_опыт = 100¹⁄²•{round(max(module_f_minus_f), 4)} = {round((max(module_f_minus_f) * 10), 4)}",
+      "< λ_крит = 1.358.",
+      "\nГипотеза Н₀ о нормальном распределении не отвергается.\n")
+
+print("6. Плотность нормального распределения:",
+      "f(x) = 0.43•exp(-0.58•(x-25.48)²)")
+
+density_of_the_normal_distribution_f = []
+
+for i in interval_boundaries_average:
+    density_of_the_normal_distribution_f.append(0.43 * math.exp((-0.58) * ((i - 25.48) ** 2)))
+    print(f"x{number + 1} = {round(i, 4)}  f(x{number + 1}) = {round(density_of_the_normal_distribution_f[number], 4)}")
+    number += 1
+else:
+    number = 0
+
+print("Откладываем эти пары значений на гистограмме относительных \nчастот, соединяем плавной линией.",
+      "\n(график на экране)\n")
+
+plt.clf()
+plt.close('all')
+fig, ax = plt.subplots()
+ax.hist(interval_boundaries[:-1], weights=densities, bins=interval_boundaries)
+
+plt.plot(interval_boundaries_average, density_of_the_normal_distribution_f , marker='o', mec='r', mfc='w')
+
+plt.xlim(min(interval_boundaries), max(interval_boundaries))
+plt.ylim(min(0, min(density_of_the_normal_distribution_f), min(densities)),
+         max(max(density_of_the_normal_distribution_f), max(densities)))
+
+plt.title("Гистограмма относительных частот")
+plt.xlabel("xᵢ")
+plt.ylabel("wᵢ/h")
+
+#plt.show()
+
+print("7. Если СВ Х генеральной совокупности распределена нормально, \nто с надежностью y = 0.95 можно уверждать, что",
+      "математическое \nожидание a СВ Х покрывается доверительным интервалом (x_ср - б, x_ср + б),",
+      "\nгде \nб = (s/n¹⁄²)•tᵧ )- точность оценки.",
+      f"\nВ нашей задаче n = 100, s = {round(corrected_mean_square_deviation_s, 4)},",
+      "tᵧ = (y, n) = t(0.95, 100) = 1.984.",
+      "\nТогда",
+      f"б = ({round(corrected_mean_square_deviation_s, 4)} / 10)•1.984 =",
+      round((corrected_mean_square_deviation_s / 10) * 1.984, 4), "\nСледовательно",
+      f"\nx_сред - б =",
+      round(statistics.mean(interval_boundaries), 4), "-", round((corrected_mean_square_deviation_s / 10) * 1.984, 4),
+      "=", round(statistics.mean(interval_boundaries) - ((corrected_mean_square_deviation_s / 10) * 1.984), 4),
+      f"\nx_сред + б =",
+      round(statistics.mean(interval_boundaries), 4), "+", round((corrected_mean_square_deviation_s / 10) * 1.984, 4),
+      "=", round(statistics.mean(interval_boundaries) + ((corrected_mean_square_deviation_s / 10) * 1.984), 4),
+      "\nТаким образом, доверительный интервал для математического ожидания",
+      f"\n({round(statistics.mean(interval_boundaries) - (corrected_mean_square_deviation_s / 10) * 1.984, 4)},"
+      f" {round(statistics.mean(interval_boundaries) + (corrected_mean_square_deviation_s / 10) * 1.984, 4)})",
+      "\nПри чем \nP()")
+
