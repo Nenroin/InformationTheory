@@ -345,5 +345,14 @@ print("7. Если СВ Х генеральной совокупности ра�
       "\nТаким образом, доверительный интервал для математического ожидания",
       f"\n({round(statistics.mean(interval_boundaries) - (corrected_mean_square_deviation_s / 10) * 1.984, 4)},"
       f" {round(statistics.mean(interval_boundaries) + (corrected_mean_square_deviation_s / 10) * 1.984, 4)})",
-      "\nПри чем \nP()")
+      "\nПри чем",
+      f"\nP({round(statistics.mean(interval_boundaries) - (corrected_mean_square_deviation_s / 10) * 1.984, 4)} < a < {round(statistics.mean(interval_boundaries) - (corrected_mean_square_deviation_s / 10) * 1.984, 4)}) = 0.95",
+      "\nДоверительный интервал. покрывающий среднее квадратическое отклонение σ с надежностью y = 0.95",
+      "\ns(1 - q) < σ < s(1 + q), \nгде q = q(y ,n) = q(0.95; 100) = 0.143",
+      "\nТочность оценки", f"\nб = s•q = {corrected_mean_square_deviation_s}•0.143 = {corrected_mean_square_deviation_s * 0.143};",
+      "\nСледовательно"
+      f"s - б = {corrected_mean_square_deviation_s} - {(corrected_mean_square_deviation_s * 0.143)} = {corrected_mean_square_deviation_s - (corrected_mean_square_deviation_s * 0.143)}",
+      f"s + б = {corrected_mean_square_deviation_s} + {(corrected_mean_square_deviation_s * 0.143)} = {corrected_mean_square_deviation_s + (corrected_mean_square_deviation_s * 0.143)}",
+      f"\nТаким образом, доверительный интервал для среднего квадратического отклонения \nσ ({corrected_mean_square_deviation_s - (corrected_mean_square_deviation_s * 0.143)}, {corrected_mean_square_deviation_s + (corrected_mean_square_deviation_s * 0.143)})",
+      f"\nПричем \n P({corrected_mean_square_deviation_s - (corrected_mean_square_deviation_s * 0.143)} < σ < {corrected_mean_square_deviation_s + (corrected_mean_square_deviation_s * 0.143)}) = 0.95")
 
