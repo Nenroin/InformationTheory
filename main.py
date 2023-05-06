@@ -115,9 +115,6 @@ print("Строим гистограмму относительных часто
 fig, ax = plt.subplots()
 ax.hist(interval_boundaries[:-1], weights=densities, bins=interval_boundaries)
 
-ax.set_xlim(min(interval_boundaries), max(interval_boundaries))
-ax.set_ylim(min(densities), max(densities))
-
 ax.set_title("Гистограмма относительных частот")
 ax.set_xlabel("Интервалы")
 ax.set_ylabel("wᵢ/h")
@@ -144,7 +141,7 @@ else:
 print("Строим график эмпирической функции или кумулятивной кривой выборки:\n(график на экране)\n")
 
 plt.clf()
-plt.plot(interval_boundaries, values_of_the_empirical_function_F, marker='o', mec='r', mfc='w')
+plt.plot(interval_boundaries, values_of_the_empirical_function_F, marker='.', mec='r', mfc='w')
 plt.xlim(min(interval_boundaries), max(interval_boundaries))
 plt.ylim(min(values_of_the_empirical_function_F), max(values_of_the_empirical_function_F))
 
@@ -244,35 +241,63 @@ else:
 print("Статистика имеет распределение «хи-квадрат» лишь при n → ∞, поэтому необходимо, чтобы в каждом",
       "\nинтервале было не менее 5 значений. Если mᵢ < 5, имеет смысл объединить соседние интервалы.")
 
-derivative_of_m = []
+n_P = []
 buff_num = 0
-x2_nabl = 0
-num_l = 0
-buff_sum = 0
+m_mines_m = []
+m_mines_m2 = []
+m_mines_m2_divide_m = []
+buff_num1 = 0
+buff_num2 = 0
+
 
 for num in distribution_of_sampling_frequencies_m:
-    derivative_of_m.append(100 * P[number])
-    buff_num = num - derivative_of_m[number]
-    if distribution_of_sampling_frequencies_m[number] > 5:
-        num_l += 1
-    elif buff_sum <= 5:
-        buff_sum += distribution_of_sampling_frequencies_m[number]
-    else:
-        num_l += 1
-    x2_nabl += (buff_num ** 2) / derivative_of_m[number]
-    print(f"№{number + 1}   m{number + 1} = {num}   P{number + 1} = m{number + 1}' = {round(derivative_of_m[number], 4)}",
-          f"  m{number + 1} - m{number + 1}' = {round(buff_num, 4)}   (m{number + 1} - m{number + 1}')² =",
-          f"{round(buff_num ** 2, 4)}", f"  ((m{number + 1} - m{number + 1}')²)/m{number + 1}' =",
-          round((buff_num ** 2) / derivative_of_m[number], 4))
+    n_P.append(100 * P[number])
+    m_mines_m.append(num - n_P[number])
     number += 1
 else:
-    print(f"m(сумма)' = {round(sum(derivative_of_m), 4)} x²_набл = {round(x2_nabl, 4)}")
+    number = len(distribution_of_sampling_frequencies_m) - 1
+
+while number >= 0:
+    if distribution_of_sampling_frequencies_m[number] < 5:
+        buff_num1 += m_mines_m[number]
+        buff_num2 += n_P[number]
+    else:
+        buff_num1 += m_mines_m[number]
+        buff_num2 += n_P[number]
+        m_mines_m2.append(buff_num1 ** 2)
+        m_mines_m2_divide_m.append((buff_num1 ** 2) / buff_num2)
+        buff_num1 = 0
+        buff_num2 = 0
+    number -= 1
+else:
     number = 0
 
-print(f"Находим X²_крит(a, k = l - 3) = X²_крит(0.05; {num_l} - 3) = X²_крит(0.05; {num_l - 3}) =",
-      round(chi2.ppf(1-.05, num_l - 3), 4))
+m_mines_m2.reverse()
+m_mines_m2_divide_m.reverse()
+index = 0
 
-print(f"Так как x²_набл = {x2_nabl} < X²_крит, то гипотеза H₀ о нормальном \nраспределении принимается.",
+for num in distribution_of_sampling_frequencies_m:
+    if distribution_of_sampling_frequencies_m[number] < 5:
+        print(f"№{number + 1}",
+              f"  m{number + 1} = {num}   P{number + 1} = m{number + 1}' = {round(n_P[number], 4)}",
+              f"  m{number + 1} - m{number + 1}' = {round(m_mines_m[number], 4)}")
+    else:
+        print(f"№{number + 1}",
+              f"  m{number + 1} = {num}   100•P{number + 1} = m{number + 1}' = {round(n_P[number], 4)}",
+              f"  m{number + 1} - m{number + 1}' = {round(m_mines_m[number], 4)}",
+              f"  (m{number + 1} - m{number + 1}')² = {round(m_mines_m2[index], 4)}",
+              f"  ((m{number + 1} - m{number + 1}')²)/m{number + 1}' = {round(m_mines_m2_divide_m[index], 4)}")
+        index += 1
+    number += 1
+else:
+    print(f"m(сумма)' = {round(sum(P), 4)} x²_набл = {round(sum(m_mines_m2_divide_m), 4)}")
+    number = 0
+
+print(f"Находим X²_крит(a, k = l - 3) = X²_крит(0.05; {len(m_mines_m2)} - 3) = X²_крит(0.05; {len(m_mines_m2) - 3}) =",
+      round(chi2.ppf(1-.05, len(m_mines_m2) - 3), 4))
+
+print(f"Так как x²_набл = {round(sum(m_mines_m2_divide_m), 4)} < X²_крит, то гипотеза H₀ о нормальном",
+      "\nраспределении принимается.",
       "\nПо критерию Колмогорова надо сравнить",
       f"\nλ_опыт = n¹⁄²•max|F*(xᵢ) - F(xᵢ)| и λ_крит(0.05) = 1.358.",
       "\nДля нормального распределения \nF(xᵢ) = 0.5 + Ф((xᵢ - x)/s).",
@@ -316,11 +341,7 @@ plt.close('all')
 fig, ax = plt.subplots()
 ax.hist(interval_boundaries[:-1], weights=densities, bins=interval_boundaries)
 
-plt.plot(interval_boundaries_average, density_of_the_normal_distribution_f , marker='o', mec='r', mfc='w')
-
-plt.xlim(min(interval_boundaries), max(interval_boundaries))
-plt.ylim(min(0, min(density_of_the_normal_distribution_f), min(densities)),
-         max(max(density_of_the_normal_distribution_f), max(densities)))
+plt.plot(interval_boundaries_average, density_of_the_normal_distribution_f, marker='.')
 
 plt.title("Гистограмма относительных частот")
 plt.xlabel("xᵢ")
@@ -362,3 +383,179 @@ print("7. Если СВ Х генеральной совокупности ра�
       "< σ <",
       f"{round(corrected_mean_square_deviation_s + (corrected_mean_square_deviation_s * 0.143), 4)}) = 0.95\n")
 
+print("ЗАДАНИЕ 2. \nДано интервальное распределение частот некоторой \nсовокупности относительно признака X :")
+
+a = [0, 36, 72, 108, 144, 180, 216, 252]
+m = [44, 24, 16, 9, 2, 5, 4]
+h = a[1] - a[0]
+
+for i in m:
+    print(f"{a[number]} - {a[number + 1]}   m{number + 1} = {i}")
+    number += 1
+else:
+    number = 0
+
+print("\nСоставим таблицу, в которой найдем плотность частоты mᵢ/h , середины интервалов",
+      "\nxᵢ, произведения xᵢmᵢ, xᵢ²mᵢ для построения полигона и гистограммы частот",
+      f"\nи нахождения числовых характеристик выборки. Длина интервалов h = {h}.")
+
+x = []
+m_divide_h = []
+x_multiply_m = []
+x2_multiply_m = []
+
+for i in m:
+    x.append((a[number] + a[number + 1]) / 2)
+    m_divide_h.append(i / h)
+    x_multiply_m.append(x[number] * i)
+    x2_multiply_m.append((x[number] ** 2) * i)
+    print(f"a{number + 1} — a{number + 2}: {a[number]} — {a[number + 1]}",
+          f"  x{number + 1} = {round(x[number], 4)}   m{number + 1} = {i}",
+          f"  m{number + 1}/h = {round(m_divide_h[number], 4)}   x{number + 1}•m{number + 1} =",
+          f"{round(x_multiply_m[number], 4)}   x{number + 1}²•m{number + 1} = {round(x2_multiply_m[number], 4)}")
+    number += 1
+else:
+    number = 0
+
+n = sum(m)
+sum_x_multiply_m = sum(x_multiply_m)
+sum_x2_multiply_m = sum(x2_multiply_m)
+
+print(f"Суммы: n = {n}   x•m = {round(sum_x_multiply_m, 4)}   x²•m = {round(sum_x2_multiply_m, 4)}")
+
+x_B = sum_x_multiply_m / n
+x2 = sum_x2_multiply_m / n
+D_B = x2 - (x_B ** 2)
+б_B = D_B ** (1/2)
+
+print(f"xᵦ = {round(sum_x_multiply_m, 4)}/{n} = {round(x_B, 4)}",
+      f"\nx² = {round(sum_x2_multiply_m)}/{n} = {round(x2, 4)}",
+      f"\nDᵦ = {round(x2, 4)} - {round(x_B, 4)}² = {round(D_B, 4)}",
+      f"\nσᵦ = {round(б_B, 4)}")
+
+print(f"Строим эмпирическую функцию распределения F*(aᵢ) = nₐᵢ/n,\naᵢ —",
+      f"концы интервалов i = 0.{len(a)}, n = {n} ")
+
+F_a = [0]
+buff_num = 0
+
+print(f"a0 = {a[0]}   F*(a0) = {F_a[0]}")
+
+for i in m:
+    buff_num += i
+    F_a.append(buff_num / n)
+    print(f"a{number + 1} = {a[number + 1]}   F*(a{number + 1}) = {buff_num}/{n} = {round(F_a[number + 1], 4)}")
+    number += 1
+else:
+    number = 0
+
+print("(Вывод графиков)")
+
+plt.clf()
+plt.close("all")
+plt.plot(x, m, marker='.')
+
+plt.xlabel("x")
+plt.ylabel("mᵢ")
+
+#plt.show()
+
+plt.clf()
+plt.close("all")
+fig, ax = plt.subplots()
+ax.hist(a[:-1], weights=m_divide_h, bins=a)
+
+ax.set_xlabel("x")
+ax.set_ylabel("mᵢ/h")
+
+#plt.show()
+
+plt.clf()
+plt.close("all")
+plt.plot(a, F_a, marker='.')
+
+plt.xlabel("x")
+plt.ylabel("mᵢ")
+
+#plt.show()
+
+lyambda = 1 / x_B
+
+print("По виду полигона частот, гистограммы, F*(x) выдвигаем гипотезу,",
+      "\nо показательном распределении признака X в генеральной совокупности.",
+      "\nПризнаком этого распределения является совпадение:",
+      "\nM(X) = σ(X) = 1/λ.",
+      f"\nВ данном случае, xᵦ и σᵦ достаточно близки: λ = 1/xᵦ = {round(lyambda, 4)}.",
+      "\nПлотность распределения")
+
+print("        | 0, если x < 0,",
+      "\nf(x) = {    ",
+      f"\n        | {round(lyambda, 4)}e^(-{round(lyambda, 4)}x), если x >= 0.")
+
+print("Теоретическая функция распределения")
+
+print("        | 0, если x < 0,",
+      "\nF(x) = {    ",
+      f"\n        | 1 - e^(-{round(lyambda, 4)}x), если x >= 0.")
+
+print("Подтвердим или опровергнем гипотезу Н0: генеральная совокупность признака",
+      "\nX подчиняется показательному закону распределения." 
+      "\nа) Критерий Пирсона. Находим теоретические (выравнивающие) частоты",
+      "\nmᵢ' = nPᵢ = n•P(aᵢ < X < aᵢ₊₁) = n•(e^(-λai) - e^(-λai+1)).",
+      "\nСравниваем",
+      "\nX²_крит(a, k = l - 2) = X²_крит(0.05; 5 - 2) = X²_крит(0.05; 3) = 7.815.")
+
+P = []
+n_P = []
+m_mines_m = []
+m_mines_m2_divide_m = []
+
+while number < 7:
+    P.append((math.e ** (-lyambda * a[number])) - (math.e ** (-lyambda * a[number + 1])))
+    n_P.append(n * P[number])
+    m_mines_m.append(m[number] - n_P[number])
+    number += 1
+else:
+    number = 6
+
+buff_num1 = 0
+buff_num2 = 0
+buff_arr = []
+
+while number >= 0:
+    if m[number] < 5:
+        buff_num1 += m_mines_m[number]
+        buff_num2 += n_P[number]
+    else:
+        buff_num1 += m_mines_m[number]
+        buff_num2 += n_P[number]
+        m_mines_m2_divide_m.append((buff_num1 ** 2) / buff_num2)
+        buff_arr.append(abs(buff_num1))
+        buff_num1 = 0
+        buff_num2 = 0
+    number -= 1
+else:
+    number = 0
+    buff_num1 = 0
+    buff_num2 = 0
+
+m_mines_m2_divide_m.reverse()
+buff_arr.reverse()
+m_mines_m = buff_arr
+index = 0
+
+while number < 7:
+    if m[number] < 5:
+        print(f"{a[number]} — {a[number + 1]}   P{number + 1} = {round(P[number], 4)}",
+              f"  m{number + 1}' = {n}•P{number + 1} = {round(n_P[number], 4)}",
+              f"  m{number + 1} = {m[number]}")
+    else:
+        print(f"{a[number]} — {a[number + 1]}   P{number + 1} = {round(P[number], 4)}",
+              f"  m{number + 1}' = {n}•P{number + 1} = {round(n_P[number], 4)}",
+              f"  m{number + 1} = {m[number]}",
+              f"  |m{number + 1} - m{number + 1}'| = {round(m_mines_m[index], 4)}",
+              f"  (m{number + 1} - m{number + 1}')²/m{number + 1}' = {round(m_mines_m2_divide_m[index], 4)}")
+        index += 1
+    number += 1
+else:
+    number = 0
