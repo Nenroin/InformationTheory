@@ -730,11 +730,11 @@ while i < 7:
 else:
     i = 0
 
-while i < 5:
-    if i < 7:
-        print(f"uᵢ∑vⱼmᵪᵧ = {round(u_v_m[i], 4)}   vⱼ∑uᵢmᵪᵧ = {round(v_u_m[i], 4)}")
+while i < 7:
+    if i < 5:
+        print(f"vⱼ∑uᵢmᵪᵧ = {round(v_u_m[i], 4)}   uᵢ∑vⱼmᵪᵧ = {round(u_v_m[i], 4)}")
     else:
-        print(f"uᵢ∑vⱼmᵪᵧ = {round(u_v_m[i], 4)}")
+        print(f"vⱼ∑uᵢmᵪᵧ = {round(v_u_m[i], 4)}")
     i += 1
 else:
     i = 0
