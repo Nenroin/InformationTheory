@@ -581,7 +581,7 @@ print("По таблице критических точек распредел�
 F_mines_F = []
 
 for i in a:
-    F_mines_F.append(F_a[number] - (1 - (math.e ** (-lyambda * a[number]))))
+    F_mines_F.append(abs(F_a[number] - (1 - (math.e ** (-lyambda * a[number])))))
     print(f"a{number + 1} = {a[number]}   F*(a{number + 1}) = {round(F_a[number], 4)}",
           f"  F(a{number + 1}) = {round(1 - (math.e ** (-lyambda * a[number])), 4)}",
           f"  |F*(a{number + 1}) - F(a{number + 1})| = {round(F_mines_F[number], 4)}")
