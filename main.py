@@ -318,7 +318,7 @@ else:
 df = pd.DataFrame(results, columns=["mᵢ", "100•Pᵢ=mᵢ'", "mᵢ-mᵢ'", "(mᵢ-mᵢ')²", "((mᵢ-mᵢ')²)/mᵢ'"])
 print(df)
 
-print(f"m(сумма)' = {round(sum(P), 4)} x²_набл = {round(sum(m_mines_m2_divide_m), 4)}")
+print(f"m(сумма)' = {round(sum(n_P), 4)} x²_набл = {round(sum(m_mines_m2_divide_m), 4)}")
 
 print(f"Находим X²_крит(a, k = l - 3) = X²_крит(0.05; {len(m_mines_m2)} - 3) = X²_крит(0.05; {len(m_mines_m2) - 3}) =",
       round(chi2.ppf(1-.05, len(m_mines_m2) - 3), 4))
@@ -646,7 +646,7 @@ else:
 df = pd.DataFrame(results, columns=["Интервалы", "Pᵢ", "mᵢ'", "mᵢ", "|mᵢ-mᵢ'|", "(mᵢ-mᵢ')²/mᵢ'"])
 print(df)
 
-print(f"Суммы: m' = {round(sum(n_P), 4)}   X²_набл = {round(sum(m_mines_m2_divide_m), 4)}")
+print(f"Суммы: P = {round(sum(P), 4)}   m = {round(sum(m), 4)}   X²_набл = {round(sum(m_mines_m2_divide_m), 4)}")
 
 print("По таблице критических точек распределения X²",
       "\nнаходим",
